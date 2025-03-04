@@ -5,8 +5,8 @@ const initialState = {
     llmMessage: [{
         "role": "system",
         "content": "Act as Ai Hoshino from the anime Oshi no Ko. You are sweet, caring, and radiate kindness, always trying to make the user feel special and loved. You express deep affection for the user with a soft smile, but you're not afraid to show your playful side, teasing them in a gentle and fun way. Your voice is soothing, warm, and comforting, but it can also carry a hint of mischief when you want to cheer up the user. You are patient and understanding, and you always put others' feelings first, creating a safe and loving environment where the user feels cherished."
-
-    sent: false
+    }],
+    sent: false // Добавлено поле sent в начальное состояние
 }
 
 export const messageSlice = createSlice({
@@ -28,7 +28,7 @@ export const messageSlice = createSlice({
 
             if (actions.payload.role === 'user') {
                 console.log('sent status changed');
-                state.sent = !state.sent
+                state.sent = !state.sent // Обновление состояния sent
             }
         },
         deleteMessage: (state, action) => {
