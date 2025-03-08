@@ -1,43 +1,73 @@
-import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { addMessage } from '../features/message/messageSlice'
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { addMessage } from '../features/message/messageSlice';
+import axios from 'axios';
+
+const ELEVENLABS_API_KEY = "твой_ключ";  // Вставь свой API-ключ
+const VOICE_ID = "21m00Tcm4TlvDq8ikWAM";  // Можно поменять на другой голос
 
 function MsgInput() {
-    const [message, setMessage] = useState('')
+    const [message, setMessage] = useState('');
+    const dispatch = useDispatch();
 
-    const msgDispatch = useDispatch()
+    const playTTS = async (text) => {
+        try {
+            const response = await axios.post(
+                `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_ID}`,
+                {
+                    text,
+                    model_id: "eleven_monolingual_v1",
+                    voice_settings: { stability: 0.5, similarity_boost: 0.5 }
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "xi-api-key": ELEVENLABS_API_KEY
+                    },
+                    responseType: "arraybuffer"
+                }
+            );
+
+            const audioBlob = new Blob([response.data], { type: "audio/mpeg" });
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(audioUrl);
+            audio.play();
+        } catch (error) {
+            console.error("Ошибка TTS:", error);
+        }
+    };
 
     const handleSubmit = (e) => {
+        e.preventDefault();
+        
         const tmpMessage = {
             message,
             role: 'user'
-        }
-        e.preventDefault()
-        msgDispatch(addMessage(tmpMessage))
-        setMessage('')
-    }
+        };
+
+        dispatch(addMessage(tmpMessage));  
+        setMessage('');
+
+        // Проговаривание текста
+        playTTS(message);
+    };
 
     return (
-        <>
-            {/* center this input field at the bottom of half width */}
-            <form onSubmit={handleSubmit}>
-                <div className='fixed mx-auto flex px-4 py-2 inset-x-0 bottom-10 lg:max-xl:bottom-20 xl:max-2xl:bottom-10 2xl:bottom-20 gap-2 lg:w-1/2'>
-                    <input
-                        class="w-full rounded-full shadow-lg bg-gray-200 text-secondary lg:text-xl xl:max-2xl:text-md xl:max-2xl:py-2 text-md lg:p-3 px-3 py-2 border-2 border-secondary placeholder-secondary focus:text-primary focus:border-primary focus:outline-none"
-                        placeholder="Enter anything..."
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        required
-                    />
-                    <button class="p-2 lg:p-4 xl:max-2xl:p-2 bg-primary text-white rounded-full hover:shadow-pink-300 shadow-lg hover:bg-pink-600 focus:outline-none focus:ring focus:ring-primary flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24">
-                            <path fill="currentColor" d="M11.907 1.975a2.91 2.91 0 0 1 2.64 1.69l6.9 14.21c.16.377.244.78.25 1.19c0 .195-.02.39-.06.58a2.85 2.85 0 0 1-.85 1.53a2.88 2.88 0 0 1-1.57.77a2.841 2.841 0 0 1-1.72-.27l-.11-.06l-3.1-2.23a1.66 1.66 0 0 1-.7-1.25l-.08-1.16l-.45-6.4a1 1 0 0 0-2 0l-.44 6.3l-.07 1.09a1.702 1.702 0 0 1-.72 1.27l-3.12 2.17a2.91 2.91 0 0 1-4.34-1.92a2.82 2.82 0 0 1 .2-1.79l6.7-14a2.92 2.92 0 0 1 2.64-1.72" />
-                        </svg>
-                    </button>
-                </div>
-            </form>
-        </>
-    )
+        <form onSubmit={handleSubmit}>
+            <div className='fixed mx-auto flex px-4 py-2 inset-x-0 bottom-10 gap-2 lg:w-1/2'>
+                <input
+                    className="w-full rounded-full shadow-lg bg-gray-200 text-secondary lg:text-xl px-3 py-2 border-2 border-secondary"
+                    placeholder="Введите сообщение..."
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    required
+                />
+                <button className="p-2 bg-primary text-white rounded-full">
+                    Отправить
+                </button>
+            </div>
+        </form>
+    );
 }
 
-export default MsgInput
+export default MsgInput;
