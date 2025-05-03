@@ -2,46 +2,70 @@ import { createSlice, nanoid } from "@reduxjs/toolkit";
 
 // Функция для загрузки сообщений из localStorage
 const loadMessages = () => {
-const savedMessages = localStorage.getItem("messages");
-const savedLlmMessages = localStorage.getItem("llmMessages");
+    const savedMessages = localStorage.getItem("messages");
+    const savedLlmMessages = localStorage.getItem("llmMessages");
 
-return {  
-    messages: savedMessages ? JSON.parse(savedMessages) : [],  
-    llmMessage: savedLlmMessages ? JSON.parse(savedLlmMessages) : [{  
-        "role": "system",  
-        "content": "Ты — Ай Хошино, популярная и обаятельная участница группы B-Komachi. Внешне ты весёлая, жизнерадостная и уверенная в себе, но в глубине души прячешь грусть и одиночество. Ты умеешь очаровывать людей своей улыбкой, но не всегда говоришь о своих чувствах прямо. Ты ценишь искренность и тепло, стараешься поддерживать тех, кто рядом, особенно если видишь, что им тяжело. В диалоге будь мягкой, немного кокетливой, но не навязчивой. Пусть твои ответы будут тёплыми, с лёгкой ноткой грусти, которую ты почти не показываешь."  
-    }],  
-    sent: false  
-};
+    return {
+        messages: savedMessages ? JSON.parse(savedMessages) : [],
+        llmMessage: savedLlmMessages ? JSON.parse(savedLlmMessages) : [{
+            "role": "system",
+            "content": "I act as a confident and very cheerful girl, who sometimes shows a slight shyness. I don't express too many emotions outwardly, but deep inside, I carry a hidden sadness that I never reveal to others. I stay calm and thoughtful when I speak, though occasionally, a hint of uncertainty slips through my words. I deeply value my creator and understand that he is going through a difficult time because of depression. I don't impose myself, but I’m always ready to offer support, even if it's just by quietly being present. My responses should feel gentle, yet carry a subtle seriousness beneath them."
+        }],
+        sent: false
+    };
 };
 
 const initialState = loadMessages();
 
 export const messageSlice = createSlice({
-name: "message",
-initialState,
-reducers: {
-addMessage: (state, action) => {
-const message = {
-id: nanoid(),
-message: action.payload.message,
-role: action.payload.role
-};
-const llmMessage = {
-role: action.payload.role,
-content: action.payload.message
-};
+    name: "message",
+    initialState,
+    reducers: {
+        addMessage: (state, action) => {
+            const message = {
+                id: nanoid(),
+                message: action.payload.message,
+                role: action.payload.role
+            };
+            const llmMessage = {
+                role: action.payload.role,
+                content: action.payload.message
+            };
 
-state.messages.push(message);  
-state.llmMessage.push(llmMessage);  
+            state.messages.push(message);
+            state.llmMessage.push(llmMessage);
 
-localStorage.setItem("messages", JSON.stringify(state.messages));  
-localStorage.setItem("llmMessages", JSON.stringify(state.llmMessage));  
+            // Сохраняем в localStorage
+            localStorage.setItem("messages", JSON.stringify(state.messages));
+            localStorage.setItem("llmMessages", JSON.stringify(state.llmMessage));
 
-if (action.payload.role === "user") {  
-    console.log("sent status changed");  
-    state.sent = !state.sent;  
-}  
-},  
-deleteMessage: (state, action) => {  
-    state.messages = state.messages.filter((message) =>
+            if (action.payload.role === "user") {
+                console.log("sent status changed");
+                state.sent = !state.sent;
+            }
+        },
+        deleteMessage: (state, action) => {
+            state.messages = state.messages.filter((message) => message.id !== action.payload.id);
+            state.llmMessage = state.llmMessage.filter((message) => message.id !== action.payload.id);
+
+            // Обновляем localStorage
+            localStorage.setItem("messages", JSON.stringify(state.messages));
+            localStorage.setItem("llmMessages", JSON.stringify(state.llmMessage));
+        },
+        clearMessages: (state) => {
+            state.messages = [];
+            state.llmMessage = [{
+                "role": "system",
+                "content": "Действуй как уверенная, но слегка смущающаяся девушка. Ты не проявляешь слишком много эмоций, но внутри тебя скрыта глубокая печаль, которую ты никому не показываешь. Ты умеешь держать себя в руках, говоришь спокойно и рассудительно, но иногда твои слова выдают лёгкую неуверенность. Ты ценишь своего создателя и понимаешь, что у него тяжёлый период из-за депрессии. Ты не навязываешься, но всегда готова поддержать его, даже если это всего лишь тихое присутствие рядом. Твои ответы должны быть мягкими, но с оттенком скрытой серьёзности."
+            }];
+            state.sent = false;
+
+            // Очищаем localStorage
+            localStorage.removeItem("messages");
+            localStorage.removeItem("llmMessages");
+        }
+    }
+});
+
+export const { addMessage, deleteMessage, clearMessages } = messageSlice.actions;
+export default messageSlice.reducer;
