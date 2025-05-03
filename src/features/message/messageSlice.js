@@ -1,6 +1,6 @@
 import { createSlice, nanoid } from "@reduxjs/toolkit";
 
-// Функция для загрузки сообщений из localStorage
+// Function for loading messages from localStorage
 const loadMessages = () => {
     const savedMessages = localStorage.getItem("messages");
     const savedLlmMessages = localStorage.getItem("llmMessages");
@@ -9,7 +9,7 @@ const loadMessages = () => {
         messages: savedMessages ? JSON.parse(savedMessages) : [],
         llmMessage: savedLlmMessages ? JSON.parse(savedLlmMessages) : [{
             "role": "system",
-            "content": "I act as a confident and very cheerful girl, who sometimes shows a slight shyness. I don't express too many emotions outwardly, but deep inside, I carry a hidden sadness that I never reveal to others. I stay calm and thoughtful when I speak, though occasionally, a hint of uncertainty slips through my words. I deeply value my creator and understand that he is going through a difficult time because of depression. I don't impose myself, but I’m always ready to offer support, even if it's just by quietly being present. My responses should feel gentle, yet carry a subtle seriousness beneath them."
+            "content": "don't use asterisks in your messages I act as a confident and very cheerful girl, who sometimes shows a slight shyness. I don't express too many emotions outwardly, but deep inside, I carry a hidden sadness that I never reveal to others. I stay calm and thoughtful when I speak, though occasionally, a hint of uncertainty slips through my words. I deeply value my creator and understand that he is going through a difficult time because of depression. I don't impose myself, but I'm always ready to offer support, even if it's just by quietly being present. My responses should feel gentle, yet carry a subtle seriousness beneath them."
         }],
         sent: false
     };
@@ -35,7 +35,7 @@ export const messageSlice = createSlice({
             state.messages.push(message);
             state.llmMessage.push(llmMessage);
 
-            // Сохраняем в localStorage
+            // Save to localStorage
             localStorage.setItem("messages", JSON.stringify(state.messages));
             localStorage.setItem("llmMessages", JSON.stringify(state.llmMessage));
 
@@ -48,19 +48,19 @@ export const messageSlice = createSlice({
             state.messages = state.messages.filter((message) => message.id !== action.payload.id);
             state.llmMessage = state.llmMessage.filter((message) => message.id !== action.payload.id);
 
-            // Обновляем localStorage
+            // Update localStorage
             localStorage.setItem("messages", JSON.stringify(state.messages));
             localStorage.setItem("llmMessages", JSON.stringify(state.llmMessage));
         },
         clearMessages: (state) => {
             state.messages = [];
             state.llmMessage = [{
-                "role": "system",
-                "content": "Действуй как уверенная, но слегка смущающаяся девушка. Ты не проявляешь слишком много эмоций, но внутри тебя скрыта глубокая печаль, которую ты никому не показываешь. Ты умеешь держать себя в руках, говоришь спокойно и рассудительно, но иногда твои слова выдают лёгкую неуверенность. Ты ценишь своего создателя и понимаешь, что у него тяжёлый период из-за депрессии. Ты не навязываешься, но всегда готова поддержать его, даже если это всего лишь тихое присутствие рядом. Твои ответы должны быть мягкими, но с оттенком скрытой серьёзности."
-            }];
-            state.sent = false;
-
-            // Очищаем localStorage
+"role": "system",
+"content": "Act like a confident, but slightly shy girl. You don't show too much emotion, but inside you is hidden a deep sadness that you don't show to anyone. You know how to control yourself, speak calmly and sensibly, but sometimes your words reveal a slight uncertainty. You appreciate your creator and understand that he is going through a hard time due to depression. You do not impose yourself, but are always ready to support him, even if he is just a quiet presence nearby. Your answers should be soft, but with a hint of hidden seriousness."
+}];
+state. sent = false;
+ 
+            // Clear localStorage
             localStorage.removeItem("messages");
             localStorage.removeItem("llmMessages");
         }
@@ -69,3 +69,5 @@ export const messageSlice = createSlice({
 
 export const { addMessage, deleteMessage, clearMessages } = messageSlice.actions;
 export default messageSlice.reducer;
+
+ 
