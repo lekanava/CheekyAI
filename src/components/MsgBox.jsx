@@ -1,16 +1,9 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useDispatch } from 'react-redux'
 import { deleteMessage } from '../features/message/messageSlice'
 
 function MsgBox({ message }) {
     const deleteDispatch = useDispatch()
-
-    useEffect(() => {
-        // Озвучиваем только ответы от ИИ
-        if (message.role === 'assistant') {
-            speakWithElevenLabs(message.message)
-        }
-    }, [message])
 
     const speakWithElevenLabs = async (text) => {
         const response = await fetch("https://api.elevenlabs.io/v1/text-to-speech/cgSgspJ2msm6clMCkdW9", {
@@ -38,6 +31,14 @@ function MsgBox({ message }) {
         <>
             <div>
                 <p className='break-words text-sm lg:text-lg xl:max-2xl:text-sm'>{message.message}</p>
+                {message.role === 'assistant' && (
+                    <button
+                        onClick={() => speakWithElevenLabs(message.message)}
+                        className="my-1 p-1 hover:bg-green-600 rounded-full"
+                    >
+                        Проиграть
+                    </button>
+                )}
                 <button
                     className={`${message.role === 'assistant' ? 'hidden' : ''} my-1 p-1 hover:bg-blue-600 rounded-full`}
                     onClick={() => deleteDispatch(deleteMessage(message))}
@@ -63,3 +64,5 @@ function MsgBox({ message }) {
 }
 
 export default MsgBox
+
+
