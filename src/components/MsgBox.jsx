@@ -13,7 +13,7 @@ function MsgBox({ message }) {
     }, [message])
 
     const speakWithElevenLabs = async (text) => {
-        const response = await fetch("https://api.elevenlabs.io/v1/text-to-speech/cgSgspJ2msm6clMCkdW9", {
+        const response = await fetch("https://api.elevenlabs.io/v1/text-to-speech/MEJe6hPrI48Kt2lFuVe3", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
