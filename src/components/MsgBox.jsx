@@ -21,7 +21,7 @@ function MsgBox({ message }) {
             },
             body: JSON.stringify({
                 text: text,
-                model_id: "eleven_monolingual_v1",
+                model_id: "flash_v2.5",
                 voice_settings: {
                     stability: 0.5,
                     similarity_boost: 0.75
